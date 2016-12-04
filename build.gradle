@@ -1,0 +1,22 @@
+buildscript {
+    repositories { jcenter() }
+    dependencies { classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.5-2' }
+}
+
+apply plugin: 'application'
+apply plugin: 'kotlin'
+
+group 'org.almibe'
+version '0.1.0-SNAPSHOT'
+
+mainClassName = "scratchpad.Main"
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+
+dependencies {
+    compile 'org.mapdb:mapdb:3.0.2'
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.0.5-2'
+}
