@@ -20,4 +20,5 @@ dependencies {
     compile 'org.mapdb:mapdb:3.0.2'
     compile 'org.jetbrains.kotlin:kotlin-stdlib:1.0.5-2'
     compile 'com.orientechnologies:orientdb-core:2.2.13'
+    compile 'org.almibe:multi-page-display:0.1.0'
 }
