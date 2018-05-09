@@ -23,4 +23,5 @@ dependencies {
 //    compile 'org.almibe:multi-page-display:0.1.0'
 //    compile 'com.google.code.gson:gson:2.8.2'
     compile 'org.jetbrains.xodus:xodus-entity-store:1.1.0'
+    compile 'io.undertow:undertow-core:2.0.6.Final'
 }
