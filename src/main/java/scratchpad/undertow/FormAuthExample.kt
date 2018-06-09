@@ -22,13 +22,14 @@ import io.undertow.Undertow
 import io.undertow.io.IoCallback
 import io.undertow.security.api.AuthenticationMechanism
 import io.undertow.security.api.AuthenticationMode
+import io.undertow.security.api.SecurityContext
 import io.undertow.security.handlers.AuthenticationCallHandler
 import io.undertow.security.handlers.AuthenticationConstraintHandler
 import io.undertow.security.handlers.AuthenticationMechanismsHandler
 import io.undertow.security.handlers.SecurityInitialHandler
 import io.undertow.security.idm.IdentityManager
-import io.undertow.security.impl.BasicAuthenticationMechanism
 import io.undertow.server.HttpHandler
+import io.undertow.server.HttpServerExchange
 import java.util.*
 
 /**
@@ -68,9 +69,24 @@ object FormAuthServer {
         var handler = toWrap
         handler = AuthenticationCallHandler(handler)
         handler = AuthenticationConstraintHandler(handler)
-        val mechanisms = listOf<AuthenticationMechanism>(BasicAuthenticationMechanism("My Realm"))
+
+        val mechanisms = mutableListOf<AuthenticationMechanism>()
+        mechanisms.add(BasicAuthenticationMechanism("My Realm2"))
+        //mechanisms.add(ExperimentMechanism())
+
         handler = AuthenticationMechanismsHandler(handler, mechanisms)
         handler = SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, identityManager, handler)
         return handler
+    }
+}
+
+class ExperimentMechanism: AuthenticationMechanism {
+    override fun sendChallenge(exchange: HttpServerExchange, securityContext: SecurityContext): AuthenticationMechanism.ChallengeResult {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun authenticate(exchange: HttpServerExchange, securityContext: SecurityContext): AuthenticationMechanism.AuthenticationMechanismOutcome {
+        exchange.responseSender.send("Hello $securityContext")
+        return AuthenticationMechanism.AuthenticationMechanismOutcome.NOT_AUTHENTICATED
     }
 }

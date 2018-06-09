@@ -118,7 +118,7 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
      */
     @Override
     public AuthenticationMechanismOutcome authenticate(HttpServerExchange exchange, SecurityContext securityContext) {
-
+        System.out.println("In auth " + exchange.getRequestHeaders().get(AUTHORIZATION));
         List<String> authHeaders = exchange.getRequestHeaders().get(AUTHORIZATION);
         if (authHeaders != null) {
             for (String current : authHeaders) {
@@ -183,6 +183,7 @@ public class BasicAuthenticationMechanism implements AuthenticationMechanism {
 
     @Override
     public ChallengeResult sendChallenge(HttpServerExchange exchange, SecurityContext securityContext) {
+        System.out.println("in sendChallenge");
         if(silent) {
             //if this is silent we only send a challenge if the request contained auth headers
             //otherwise we assume another method will send the challenge
