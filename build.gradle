@@ -9,7 +9,7 @@ apply plugin: 'kotlin'
 group 'org.almibe'
 version '0.1.0-SNAPSHOT'
 
-mainClassName = "scratchpad.Main"
+mainClassName = "scratchpad.jline.Main"
 
 repositories {
     mavenLocal()
@@ -17,11 +17,10 @@ repositories {
 }
 
 dependencies {
-//    compile 'org.mapdb:mapdb:3.0.2'
+    compile 'org.mapdb:mapdb:3.0.2'
     compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.60'
     compile 'com.orientechnologies:orientdb-core:2.2.13'
-//    compile 'org.almibe:multi-page-display:0.1.0'
-//    compile 'com.google.code.gson:gson:2.8.2'
+    compile 'com.google.code.gson:gson:2.8.2'
     compile 'org.jetbrains.xodus:xodus-entity-store:1.1.0'
-    compile 'io.undertow:undertow-core:2.0.6.Final'
+    compile 'org.jline:jline:3.9.0'
 }
