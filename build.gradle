@@ -1,6 +1,6 @@
 buildscript {
     repositories { jcenter() }
-    dependencies { classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.51' }
+    dependencies { classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.60' }
 }
 
 apply plugin: 'application'
@@ -18,9 +18,11 @@ repositories {
 
 dependencies {
     compile 'org.mapdb:mapdb:3.0.2'
-    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.60'
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.60'
     compile 'com.orientechnologies:orientdb-core:2.2.13'
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'org.jetbrains.xodus:xodus-entity-store:1.1.0'
     compile 'org.jline:jline:3.9.0'
+    compile 'io.undertow:undertow-core:2.0.1.Final'
+    compile 'org.infinispan:infinispan-core:9.3.2.Final'
 }
