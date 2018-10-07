@@ -1,42 +1,60 @@
 package scratchpad.jgroups
 
-import org.jgroups.JChannel
-import org.jgroups.Message
-import org.jgroups.ReceiverAdapter
-import org.jgroups.View
+import org.jgroups.*
+import org.jgroups.blocks.RpcDispatcher
 import org.jgroups.protocols.*
 import org.jgroups.protocols.pbcast.GMS
 import org.jgroups.protocols.pbcast.NAKACK2
 import org.jgroups.protocols.pbcast.STABLE
 import java.net.InetAddress
 
-fun main(args: Array<String>) {
-    val protocolStack = listOf(
-        UDP().setValue("bind_addr", InetAddress.getByName("127.0.0.1")),
-        PING(),
-        MERGE3(),
-        FD_SOCK(),
-        FD_ALL(),
-        VERIFY_SUSPECT(),
-        BARRIER(),
-        NAKACK2(),
-        UNICAST3(),
-        STABLE(),
-        GMS(),
-        UFC(),
-        MFC(),
-        FRAG2())
-    val ch = JChannel(protocolStack).name(args[0])
+fun createWithReceiver(receiver: Receiver): JChannel {
 
-    ch.receiver = object: ReceiverAdapter() {
+    val protocolStack = listOf(
+            UDP(),
+            PING(),
+            MERGE3(),
+            FD_SOCK(),
+            FD_ALL(),
+            VERIFY_SUSPECT(),
+            BARRIER(),
+            NAKACK2(),
+            UNICAST3(),
+            STABLE(),
+            GMS(),
+            UFC(),
+            MFC(),
+            FRAG2())
+    val ch = JChannel(protocolStack)
+
+    ch.receiver = receiver
+
+    ch.connect("ChatCluster")
+    return ch
+}
+
+fun main(args: Array<String>) {
+    val channel1 = createWithReceiver(object: ReceiverAdapter() {
         override fun viewAccepted(new_view: View) {
-            System.out.println("view: " + new_view);
+            System.out.println("1 - view: " + new_view);
         }
 
         override fun receive(msg: Message) {
-            System.out.println("<< " + msg.getObject() + " [" + msg.getSrc() + "]");
+            System.out.println("1 - << " + msg.getObject() + " [" + msg.getSrc() + "]");
         }
-    }
+    })
 
-    ch.connect("ChatCluster")
+    val channel2 = createWithReceiver(object: ReceiverAdapter() {
+        override fun viewAccepted(new_view: View) {
+            System.out.println("2 - view: " + new_view);
+        }
+
+        override fun receive(msg: Message) {
+            System.out.println("2 - << " + msg.getObject() + " [" + msg.getSrc() + "]");
+        }
+    })
+
+    println("about to send message")
+    channel2.send(Message(null, "Hello from 2"))
+    println("message sent")
 }
