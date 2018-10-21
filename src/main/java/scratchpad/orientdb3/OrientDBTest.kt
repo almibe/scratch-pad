@@ -1,2 +1,0 @@
-package scratchpad.orientdb3
-
