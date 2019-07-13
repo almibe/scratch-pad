@@ -1,2 +1,4 @@
 package scratchpad
 
+fun main() {
+}
