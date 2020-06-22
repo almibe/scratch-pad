@@ -2,96 +2,54 @@
 
 package scratchpad
 
-import jetbrains.exodus.bindings.IntegerBinding
-import jetbrains.exodus.env.Environments
-import jetbrains.exodus.env.StoreConfig
-import kotlin.random.Random
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
+import java.lang.Exception
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.stream.Collectors
 
-fun main() {
-
-
-//    val env = Environments.newInstance("/home/alex/tempXodus2")
-//
-//    env.clear()
-//
-//    env.close()
-
-
-
-
-//    val start2 = System.currentTimeMillis()
-//    for (x in 0..10000) {
-//        val t1 = env.beginTransaction()
-//
-//        for (y in 0..6) {
-//            val c1 = env.openStore("cnt$y", StoreConfig.WITHOUT_DUPLICATES, t1)
-//
-//            c1.put(t1, intToEntry(Random.nextInt()), booleanToEntry(Random.nextBoolean()))
-//        }
-//
-//        t1.commit()
-//    }
-//    val end2 = System.currentTimeMillis()
-//
-//
-//    val start1 = System.currentTimeMillis()
-//    for (x in 0..10000) {
-//        val t1 = env.beginTransaction()
-//
-//        val c1 = env.openStore("cnt", StoreConfig.WITHOUT_DUPLICATES, t1)
-//
-//        for (y in 0..6) {
-//            c1.put(t1, stringToEntry("${Random.nextInt()}-${Random.nextInt()}-${Random.nextInt()}-${Random.nextInt()}-${Random.nextInt()}-${Random.nextInt()}"), booleanToEntry(Random.nextBoolean()))
-//        }
-//
-//        t1.commit()
-//    }
-//    val end1 = System.currentTimeMillis()
-
-
-
-    val env2 = Environments.newInstance("/home/alex/tempXodus2")
-    var t = env2.beginTransaction()
-
-
-    val store = env2.openStore("test", StoreConfig.WITHOUT_DUPLICATES, t)
-
-    println(store.count(t))
-
-    val start3 = System.currentTimeMillis()
-    for (x in 0..1000000) {
-        store.put(t, IntegerBinding.intToEntry(Random.nextInt()), IntegerBinding.intToEntry(Random.nextInt()))
-    }
-    t.commit()
-
-    val writeEnd = System.currentTimeMillis()
-    t = env2.beginTransaction()
-
-    var c = 0
-
-    for (x in 0..1000000) {
-        val result = store.get(t, IntegerBinding.intToEntry(Random.nextInt()))
-        if (result == null) {
-            c++
+fun main(args: Array<String>) {
+    val start = System.currentTimeMillis()
+    if (args.size == 1 && Files.isDirectory(Paths.get(args[0]))) {
+        runBlocking {
+            createReport(Paths.get(args[0]))
         }
+    } else {
+        error("Enter valid directory name.")
     }
-    t.abort()
-    val end3 = System.currentTimeMillis()
-
-
-
-
-    env2.close()
-
-
-
-//    env.close()
-
-//    println("${end1 - start1}")
-
-//    println("${end2 - start2}")
-    println("write - ${end3 - writeEnd}")
-    println("read - ${(end3 - start3) - (end3 - writeEnd)}")
-    println("total - ${end3 - start3}")
-
+    val end = System.currentTimeMillis()
+    println("***${end - start}")
 }
+
+suspend fun createReport(path: Path) {
+    val files = getFiles(path)
+    val result: Set<Pair<Path, Int>> = files.map {file ->
+        val lines = getLines(file)
+        val indentations = lines.map { getChars(it) }.map { getIndentation(it) }
+        val max: Int = indentations.fold(0) { max, current -> if(max > current) max else current }
+        file to max
+    }.toSet()
+
+    result.sortedBy { it.second }.forEach {
+        println("${it.first.toAbsolutePath()} - ${it.second}")
+    }
+}
+
+fun getFiles(path: Path): Flow<Path> =
+    Files.walk(path).filter { Files.isRegularFile(it) }.collect(Collectors.toList()).asFlow()
+
+fun getLines(file: Path): Flow<String> {
+    return try {
+        Files.readAllLines(file).asFlow()
+    } catch (ex: Exception) {
+        flow {}
+    }
+}
+
+fun getChars(line: String): Flow<Char> =
+    line.toCharArray().toList().asFlow()
+
+suspend fun getIndentation(chars: Flow<Char>): Int =
+    chars.takeWhile { it == ' ' }.count()
